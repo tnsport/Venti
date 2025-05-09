@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vent - Desabafa com quem te entende</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes cloudMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .cloud-bg {
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 50%, #80deea 100%);
+            background-size: 200% 200%;
+            animation: cloudMove 15s ease infinite;
+        }
+        
+        .avatar-selector {
+            transition: all 0.3s ease;
+        }
+        
+        .avatar-selector:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .avatar-selected {
+            border: 3px solid #4fc3f7;
+            box-shadow: 0 0 0 3px rgba(79, 195, 247, 0.3);
+        }
+        
+        .message-bubble {
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #9e9e9e;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+        
+        .interest-chip {
+            transition: all 0.2s ease;
+        }
+        
+        .interest-chip:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .interest-selected {
+            background-color: #4fc3f7;
+            color: white;
+        }
+        
+        .avatar-card {
+            transition: all 0.3s ease;
+        }
+        
+        .avatar-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab-active {
+            color: #4fc3f7;
+            border-bottom: 3px solid #4fc3f7;
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Onboarding/Login Screen -->
+    <div id="onboarding-screen" class="fixed inset-0 flex flex-col items-center justify-center cloud-bg z-50 transition-opacity duration-500">
+        <div class="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md mx-4">
+            <div class="flex flex-col items-center mb-8">
+                <div class="text-5xl font-bold text-blue-400 mb-2">Vent</div>
+                <div class="text-gray-500">Desabafa com quem te entende</div>
+            </div>
+            
+            <div class="space-y-4">
+                <button onclick="showLoginForm()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-xl font-medium transition">
+                    Entrar com e-mail
+                </button>
+                
+                <button onclick="showSignupForm()" class="w-full border border-blue-500 text-blue-500 hover:bg-blue-50 py-3 px-4 rounded-xl font-medium transition">
+                    Criar conta nova
+                </button>
+                
+                <button onclick="continueAsGuest()" class="w-full border border-gray-300 text-gray-700 hover:bg-gray-100 py-3 px-4 rounded-xl font-medium transition">
+                    Entrar como convidado
+                </button>
+                
+                <button onclick="showForgotPassword()" class="text-blue-500 text-sm hover:underline mt-2">
+                    Esqueci a senha
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Form -->
+    <div id="login-form" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50 hidden">
+        <div class="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="hideLoginForm()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 class="text-xl font-bold text-center flex-grow">Entrar na sua conta</h2>
+            </div>
+            
+            <form class="space-y-4">
+                <div>
+                    <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="login-email" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="login-password" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <button type="button" onclick="loginUser()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-xl font-medium transition">
+                    Entrar
+                </button>
+                
+                <div class="text-center text-sm text-gray-500">
+                    Não tem uma conta? <button onclick="showSignupForm()" class="text-blue-500 hover:underline">Cadastre-se</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Signup Form -->
+    <div id="signup-form" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50 hidden">
+        <div class="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="hideSignupForm()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 class="text-xl font-bold text-center flex-grow">Criar nova conta</h2>
+            </div>
+            
+            <form class="space-y-4">
+                <div>
+                    <label for="signup-name" class="block text-sm font-medium text-gray-700 mb-1">Nome completo</label>
+                    <input type="text" id="signup-name" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="signup-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="signup-email" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="signup-password" class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="signup-password" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="signup-confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirmar senha</label>
+                    <input type="password" id="signup-confirm-password" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <button type="button" onclick="createAccount()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-xl font-medium transition">
+                    Criar conta
+                </button>
+                
+                <div class="text-center text-sm text-gray-500">
+                    Já tem uma conta? <button onclick="showLoginForm()" class="text-blue-500 hover:underline">Faça login</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Forgot Password Form -->
+    <div id="forgot-password" class="fixed inset-0 flex flex-col items-center justify-center bg-white z-50 hidden">
+        <div class="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="hideForgotPassword()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 class="text-xl font-bold text-center flex-grow">Recuperar senha</h2>
+            </div>
+            
+            <form class="space-y-4">
+                <div>
+                    <label for="forgot-email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
+                    <input type="email" id="forgot-email" class="w-full border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <p class="text-sm text-gray-600">Enviaremos um link para redefinir sua senha no e-mail cadastrado.</p>
+                
+                <button type="button" onclick="sendResetLink()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-xl font-medium transition">
+                    Enviar link
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Personalization Screen -->
+    <div id="personalization-screen" class="fixed inset-0 bg-white z-40 overflow-y-auto hidden">
+        <div class="container mx-auto px-4 py-8 max-w-3xl">
+            <div class="text-center mb-8">
+                <h1 class="text-3xl font-bold text-blue-500 mb-2">Vent</h1>
+                <p class="text-gray-600">Vamos personalizar sua experiência</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">O que você gosta?</h2>
+                <p class="text-gray-600 mb-4">Escolha seus interesses para que possamos recomendar os melhores avatares para você.</p>
+                
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="toggleInterest(this)" class="interest-chip bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full flex items-center">
+                        <i class="fas fa-tree mr-2"></i> Natureza
+                    </button>
+                    <button onclick="toggleInterest(this)" class="interest-chip bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full flex items-center">
+                        <i class="fas fa-music mr-2"></i> Música
+                    </button>
+                    <button onclick="toggleInterest(this)" class="interest-chip bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full flex items-center">
+                        <i class="fas fa-praying-hands mr-2"></i> Espiritualidade
+                    </button>
+                    <button onclick="toggleInterest(this)" class="interest-chip bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full flex items-center">
+                        <i class="fas fa-laugh-squint mr-2"></i> Humor
+                    </button>
+                    <button onclick="toggleInterest(this)" class="interest-chip bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full flex items-center">
+                        <i class="fas fa-spa mr-2"></i> Meditação
+                    </button>
+                    <button onclick="toggleInterest(this)" class="interest-chip bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full flex items-center">
+                        <i class="fas fa-comment-dots mr-2"></i> Desabafos
+                    </button>
+                    <button onclick="toggleInterest(this)" class="interest-chip bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full flex items-center">
+                        <i class="fas fa-book mr-2"></i> Leitura
+                    </button>
+                    <button onclick="toggleInterest(this)" class="interest-chip bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-full flex items-center">
+                        <i class="fas fa-utensils mr-2"></i> Culinária
+                    </button>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">Com quem você gostaria de conversar?</h2>
+                <p class="text-gray-600 mb-4">Selecione os tipos de pessoas que você gostaria que estivessem disponíveis para você.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div>
+                        <input type="checkbox" id="avó" class="hidden peer" checked>
+                        <label for="avó" class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                            <i class="fas fa-female text-3xl mb-2 text-gray-700"></i>
+                            <span>Avó</span>
+                        </label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="pai" class="hidden peer" checked>
+                        <label for="pai" class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                            <i class="fas fa-male text-3xl mb-2 text-gray-700"></i>
+                            <span>Pai</span>
+                        </label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="irmão" class="hidden peer" checked>
+                        <label for="irmão" class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                            <i class="fas fa-user-friends text-3xl mb-2 text-gray-700"></i>
+                            <span>Irmão</span>
+                        </label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="amigo" class="hidden peer" checked>
+                        <label for="amigo" class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                            <i class="fas fa-user text-3xl mb-2 text-gray-700"></i>
+                            <span>Melhor amigo(a)</span>
+                        </label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="terapeuta" class="hidden peer" checked>
+                        <label for="terapeuta" class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                            <i class="fas fa-heartbeat text-3xl mb-2 text-gray-700"></i>
+                            <span>Terapeuta</span>
+                        </label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="coach" class="hidden peer" checked>
+                        <label for="coach" class="flex flex-col items-center justify-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50">
+                            <i class="fas fa-trophy text-3xl mb-2 text-gray-700"></i>
+                            <span>Coach motivacional</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4">Escolha seus avatares</h2>
+                <p class="text-gray-600 mb-4">Selecione pelo menos um avatar para começar a conversar.</p>
+                
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div onclick="selectAvatar(this)" class="avatar-selector flex flex-col items-center p-4 border border-gray-200 rounded-xl cursor-pointer">
+                        <img src="https://randomuser.me/api/portraits/women/60.jpg" alt="Maria" class="w-16 h-16 rounded-full mb-2">
+                        <span class="font-medium">Maria</span>
+                        <span class="text-sm text-gray-500">Avó</span>
+                    </div>
+                    <div onclick="selectAvatar(this)" class="avatar-selector flex flex-col items-center p-4 border border-gray-200 rounded-xl cursor-pointer">
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="João" class="w-16 h-16 rounded-full mb-2">
+                        <span class="font-medium">João</span>
+                        <span class="text-sm text-gray-500">Tio legal</span>
+                    </div>
+                    <div onclick="selectAvatar(this)" class="avatar-selector flex flex-col items-center p-4 border border-gray-200 rounded-xl cursor-pointer">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Carla" class="w-16 h-16 rounded-full mb-2">
+                        <span class="font-medium">Carla</span>
+                        <span class="text-sm text-gray-500">Terapeuta</span>
+                    </div>
+                    <div onclick="selectAvatar(this)" class="avatar-selector flex flex-col items-center p-4 border border-gray-200 rounded-xl cursor-pointer">
+                        <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Sérgio" class="w-16 h-16 rounded-full mb-2">
+                        <span class="font-medium">Sérgio</span>
+                        <span class="text-sm text-gray-500">Coach</span>
+                    </div>
+                    <div onclick="selectAvatar(this)" class="avatar-selector flex flex-col items-center p-4 border border-gray-200 rounded-xl cursor-pointer">
+                        <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Ana" class="w-16 h-16 rounded-full mb-2">
+                        <span class="font-medium">Ana</span>
+                        <span class="text-sm text-gray-500">Amiga</span>
+                    </div>
+                    <div onclick="selectAvatar(this)" class="avatar-selector flex flex-col items-center p-4 border border-gray-200 rounded-xl cursor-pointer">
+                        <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Pedro" class="w-16 h-16 rounded-full mb-2">
+                        <span class="font-medium">Pedro</span>
+                        <span class="text-sm text-gray-500">Irmão</span>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="completePersonalization()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 px-4 rounded-xl font-medium transition">
+                Continuar
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main App Interface -->
+    <div id="app-interface" class="hidden">
+        <!-- Header -->
+        <header class="bg-white shadow-sm fixed top-0 left-0 right-0 z-30">
+            <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+                <div class="flex items-center">
+                    <button id="menu-button" class="mr-4 text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="text-lg font-semibold text-blue-500">Vent</h1>
+                    <span class="ml-2 text-sm text-gray-500 hidden md:inline">Conectado ao teu conforto emocional</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <button class="text-gray-600 hover:text-gray-900 relative">
+                        <i class="fas fa-bell"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
+                    </button>
+                    <img src="https://randomuser.me/api/portraits/women/25.jpg" alt="Profile" class="w-8 h-8 rounded-full">
+                </div>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="mt-16 mb-16">
+            <!-- Conversations Tab -->
+            <div id="conversations-tab" class="container mx-auto px-4 py-4">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="divide-y divide-gray-200">
+                        <!-- Chat item 1 -->
+                        <div onclick="openChat('Maria')" class="p-4 flex items-center hover:bg-gray-50 cursor-pointer">
+                            <img src="https://randomuser.me/api/portraits/women/60.jpg" alt="Maria" class="w-12 h-12 rounded-full mr-3">
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-medium">Maria (Avó)</h3>
+                                    <span class="text-xs text-gray-500">10:30</span>
+                                </div>
+                                <p class="text-sm text-gray-600 truncate">Oi netinho, como você está hoje?</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Chat item 2 -->
+                        <div onclick="openChat('João')" class="p-4 flex items-center hover:bg-gray-50 cursor-pointer">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="João" class="w-12 h-12 rounded-full mr-3">
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-medium">João (Tio legal)</h3>
+                                    <span class="text-xs text-gray-500">09:15</span>
+                                </div>
+                                <p class="text-sm text-gray-600 truncate">E aí, campeão? Bora jogar uma bola depois?</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Chat item 3 -->
+                        <div onclick="openChat('Carla')" class="p-4 flex items-center hover:bg-gray-50 cursor-pointer">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Carla" class="w-12 h-12 rounded-full mr-3">
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-medium">Carla (Terapeuta)</h3>
+                                    <span class="text-xs text-gray-500">Ontem</span>
+                                </div>
+                                <p class="text-sm text-gray-600 truncate">Como você se sentiu após nossa última conversa?</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Chat item 4 -->
+                        <div onclick="openChat('Sérgio')" class="p-4 flex items-center hover:bg-gray-50 cursor-pointer">
+                            <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="Sérgio" class="w-12 h-12 rounded-full mr-3">
+                            <div class="flex-1">
+                                <div class="flex justify-between items-center">
+                                    <h3 class="font-medium">Sérgio (Coach)</h3>
+                                    <span class="text-xs text-gray-500">Ontem</span>
+                                </div>
+                                <p class="text-sm text-gray-600 truncate">Você já fez seus exercícios de hoje?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Explore Tab -->
+            <div id="explore-tab" class="container mx-auto px-4 py-4 hidden">
+                <div class="mb-6">
+                    <div class="flex space-x-2 overflow-x-auto pb-2">
+                        <button class="px-4 py-2 bg-blue-500 text-white rounded-full text-sm whitespace-nowrap">
+                            Todos
+                        </button>
+                        <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm whitespace-nowrap">
+                            Avós
+                        </button>
+                        <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm whitespace-nowrap">
+                            Terapeutas
+                        </button>
+                        <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm whitespace-nowrap">
+                            Amigos
+                        </button>
+                        <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm whitespace-nowrap">
+                            Coaches
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Avatar card 1 -->
+                    <div class="avatar-card bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="p-4 flex items-center">
+                            <img src="https://randomuser.me/api/portraits/women/65.jpg" alt="Rosa" class="w-16 h-16 rounded-full mr-4">
+                            <div>
+                                <h3 class="font-medium">Rosa</h3>
+                                <p class="text-sm text-gray-600">Avó carinhosa</p>
+                                <div class="flex mt-1">
+                                    <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">Aconselhamento</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-4 pb-4">
+                            <p class="text-sm text-gray-700 mb-3">"Sempre pronta para ouvir e dar conselhos com muito amor e paciência."</p>
+                            <button onclick="startChat('Rosa')" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium">
+                                Iniciar conversa
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Avatar card 2 -->
+                    <div class="avatar-card bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="p-4 flex items-center">
+                            <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Marcos" class="w-16 h-16 rounded-full mr-4">
+                            <div>
+                                <h3 class="font-medium">Marcos</h3>
+                                <p class="text-sm text-gray-600">Coach motivacional</p>
+                                <div class="flex mt-1">
+                                    <span class="bg-green-100 text-green-800 text-xs px-2 py-1 rounded">Motivação</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-4 pb-4">
+                            <p class="text-sm text-gray-700 mb-3">"Vamos juntos alcançar seus objetivos! Acredite no seu potencial."</p>
+                            <button onclick="startChat('Marcos')" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium">
+                                Iniciar conversa
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Avatar card 3 -->
+                    <div class="avatar-card bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="p-4 flex items-center">
+                            <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Lúcia" class="w-16 h-16 rounded-full mr-4">
+                            <div>
+                                <h3 class="font-medium">Lúcia</h3>
+                                <p class="text-sm text-gray-600">Terapeuta</p>
+                                <div class="flex mt-1">
+                                    <span class="bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">Apoio emocional</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-4 pb-4">
+                            <p class="text-sm text-gray-700 mb-3">"Um espaço seguro para você expressar seus sentimentos e pensamentos."</p>
+                            <button onclick="startChat('Lúcia')" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium">
+                                Iniciar conversa
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Avatar card 4 -->
+                    <div class="avatar-card bg-white rounded-xl shadow-sm overflow-hidden">
+                        <div class="p-4 flex items-center">
+                            <img src="https://randomuser.me/api/portraits/men/22.jpg" alt="Ricardo" class="w-16 h-16 rounded-full mr-4">
+                            <div>
+                                <h3 class="font-medium">Ricardo</h3>
+                                <p class="text-sm text-gray-600">Melhor amigo</p>
+                                <div class="flex mt-1">
+                                    <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded">Humor</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="px-4 pb-4">
+                            <p class="text-sm text-gray-700 mb-3">"Sempre pronto para uma boa risada e para te apoiar nos momentos difíceis."</p>
+                            <button onclick="startChat('Ricardo')" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium">
+                                Iniciar conversa
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Community Tab -->
+            <div id="community-tab" class="container mx-auto px-4 py-4 hidden">
+                <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+                    <div class="flex items-center mb-4">
+                        <img src="https://randomuser.me/api/portraits/women/25.jpg" alt="You" class="w-10 h-10 rounded-full mr-3">
+                        <input type="text" placeholder="Como você está se sentindo hoje?" class="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div class="flex justify-between">
+                        <button class="text-gray-500 hover:text-blue-500">
+                            <i class="fas fa-image mr-1"></i> Foto
+                        </button>
+                        <button class="text-gray-500 hover:text-blue-500">
+                            <i class="fas fa-microphone mr-1"></i> Áudio
+                        </button>
+                        <button class="text-gray-500 hover:text-blue-500">
+                            <i class="fas fa-smile mr-1"></i> Emoji
+                        </button>
+                        <button class="text-gray-500 hover:text-blue-500">
+                            <i class="fas fa-map-marker-alt mr-1"></i> Localização
+                        </button>
+                        <button class="px-4 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded-full text-sm">
+                            Postar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+                    <div class="flex items-center mb-3">
+                        <img src="https://randomuser.me/api/portraits/women/33.jpg" alt="Ana" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <h4 class="font-medium">Ana Silva</h4>
+                            <p class="text-xs text-gray-500">2 horas atrás</p>
+                        </div>
+                    </div>
+                    <p class="mb-3">Hoje foi um dia difícil no trabalho, mas consegui resolver um problema que estava me incomodando há semanas. Pequenas vitórias! 😊</p>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <button class="flex items-center mr-4 hover:text-blue-500">
+                            <i class="far fa-heart mr-1"></i> 12
+                        </button>
+                        <button class="flex items-center hover:text-blue-500">
+                            <i class="far fa-comment mr-1"></i> 3
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-4 mb-4">
+                    <div class="flex items-center mb-3">
+                        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Carlos" class="w-10 h-10 rounded-full mr-3">
+                        <div>
+                            <h4 class="font-medium">Carlos Oliveira</h4>
+                            <p class="text-xs text-gray-500">5 horas atrás</p>
+                        </div>
+                    </div>
+                    <p class="mb-3">Alguém mais sente que está sempre correndo atrás do tempo? Parece que nunca tenho tempo suficiente para tudo que quero fazer...</p>
+                    <div class="flex items-center text-sm text-gray-500">
+                        <button class="flex items-center mr-4 hover:text-blue-500">
+                            <i class="far fa-heart mr-1"></i> 8
+                        </button>
+                        <button class="flex items-center hover:text-blue-500">
+                            <i class="far fa-comment mr-1"></i> 5
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="container mx-auto px-4 py-4 hidden">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+                    <div class="p-4 flex items-center">
+                        <img src="https://randomuser.me/api/portraits/women/25.jpg" alt="Profile" class="w-16 h-16 rounded-full mr-4">
+                        <div>
+                            <h3 class="font-medium">Ana Carolina</h3>
+                            <p class="text-sm text-gray-600">Plano Gratuito</p>
+                        </div>
+                    </div>
+                    
+                    <div class="divide-y divide-gray-200">
+                        <a href="#" class="p-4 flex items-center justify-between hover:bg-gray-50">
+                            <span>Meu perfil</span>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </a>
+                        <a href="#" class="p-4 flex items-center justify-between hover:bg-gray-50">
+                            <span>Notificações</span>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </a>
+                        <a href="#" class="p-4 flex items-center justify-between hover:bg-gray-50">
+                            <span>Privacidade</span>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </a>
+                        <a href="#" class="p-4 flex items-center justify-between hover:bg-gray-50">
+                            <span>Tema</span>
+                            <div class="flex items-center">
+                                <span class="text-sm text-gray-500 mr-2">Claro</span>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="p-4 flex items-center justify-between hover:bg-gray-50">
+                            <span>Estilo da IA</span>
+                            <div class="flex items-center">
+                                <span class="text-sm text-gray-500 mr-2">Empática</span>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="p-4 flex items-center justify-between hover:bg-gray-50">
+                            <span>Idioma</span>
+                            <div class="flex items-center">
+                                <span class="text-sm text-gray-500 mr-2">Português</span>
+                                <i class="fas fa-chevron-right text-gray-400"></i>
+                            </div>
+                        </a>
+                        <a href="#" class="p-4 flex items-center justify-between hover:bg-gray-50">
+                            <span>Planos e assinaturas</span>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </a>
+                        <a href="#" class="p-4 flex items-center justify-between hover:bg-gray-50">
+                            <span>Ajuda e suporte</span>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </a>
+                        <a href="#" class="p-4 flex items-center justify-between hover:bg-gray-50">
+                            <span>Sobre o Vent</span>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <button onclick="logout()" class="w-full bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-xl font-medium">
+                    Sair da conta
+                </button>
+            </div>
+            
+            <!-- Chat Screen -->
+            <div id="chat-screen" class="fixed inset-0 bg-white z-40 hidden">
+                <div class="h-full flex flex-col">
+                    <!-- Chat header -->
+                    <div class="bg-white shadow-sm p-4 flex items-center">
+                        <button onclick="closeChat()" class="mr-3 text-gray-600">
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                        <img id="chat-avatar-img" src="https://randomuser.me/api/portraits/women/60.jpg" alt="Avatar" class="w-10 h-10 rounded-full mr-3">
+                        <div class="flex-1">
+                            <h3 id="chat-avatar-name" class="font-medium">Maria</h3>
+                            <p id="chat-avatar-role" class="text-xs text-gray-500">Avó</p>
+                        </div>
+                        <button class="text-gray-600 ml-3">
+                            <i class="fas fa-phone-alt"></i>
+                        </button>
+                        <button class="text-gray-600 ml-3">
+                            <i class="fas fa-video"></i>
+                        </button>
+                        <button class="text-gray-600 ml-3">
+                            <i class="fas fa-ellipsis-v"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Chat messages -->
+                    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 bg-gray-50">
+                        <!-- Messages will be added here dynamically -->
+                    </div>
+                    
+                    <!-- Chat input -->
+                    <div class="bg-white border-t border-gray-200 p-3">
+                        <div class="flex items-center">
+                            <button class="text-gray-500 hover:text-gray-700 mx-2">
+                                <i class="far fa-smile"></i>
+                            </button>
+                            <button class="text-gray-500 hover:text-gray-700 mx-2">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <input type="text" id="message-input" placeholder="Digite uma mensagem..." class="flex-1 border border-gray-300 rounded-full px-4 py-2 mx-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <button onclick="sendMessage()" class="bg-blue-500 hover:bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center ml-2">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Bottom Navigation -->
+        <nav class="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-30">
+            <div class="flex justify-around">
+                <button onclick="showTab('conversations')" class="flex flex-col items-center justify-center py-3 px-6 text-blue-500 tab-active">
+                    <i class="fas fa-comment-dots text-xl"></i>
+                    <span class="text-xs mt-1">Conversas</span>
+                </button>
+                <button onclick="showTab('explore')" class="flex flex-col items-center justify-center py-3 px-6 text-gray-500">
+                    <i class="fas fa-compass text-xl"></i>
+                    <span class="text-xs mt-1">Explorar</span>
+                </button>
+                <button onclick="showTab('community')" class="flex flex-col items-center justify-center py-3 px-6 text-gray-500">
+                    <i class="fas fa-users text-xl"></i>
+                    <span class="text-xs mt-1">Comunidade</span>
+                </button>
+                <button onclick="showTab('settings')" class="flex flex-col items-center justify-center py-3 px-6 text-gray-500">
+                    <i class="fas fa-cog text-xl"></i>
+                    <span class="text-xs mt-1">Definições</span>
+                </button>
+            </div>
+        </nav>
+    </div>
+    
+    <!-- Subscription Plans Modal -->
+    <div id="plans-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+            <div class="p-6">
+                <h2 class="text-xl font-bold mb-4">Planos disponíveis</h2>
+                
+                <div class="space-y-4">
+                    <!-- Free Plan -->
+                    <div class="border border-gray-200 rounded-lg p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-medium">Gratuito</h3>
+                                <p class="text-sm text-gray-600">1 avatar, apenas texto e emoji</p>
+                            </div>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Atual</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Basic Plan -->
+                    <div class="border border-blue-500 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-medium">Básico</h3>
+                                <p class="text-sm text-gray-600">Até 5 avatares, mensagens com áudio</p>
+                            </div>
+                            <span class="text-blue-500 font-bold">€9,90/mês</span>
+                        </div>
+                        <button class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg font-medium">
+                            Assinar
+                        </button>
+                    </div>
+                    
+                    <!-- Extra Plan -->
+                    <div class="border border-purple-500 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-medium">Extra</h3>
+                                <p class="text-sm text-gray-600">Chamadas de voz, comunidade, respostas personalizadas</p>
+                            </div>
+                            <span class="text-purple-500 font-bold">€23/mês</span>
+                        </div>
+                        <button class="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg font-medium">
+                            Assinar
+                        </button>
+                    </div>
+                    
+                    <!-- Premium Plan -->
+                    <div class="border border-yellow-500 rounded-lg p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-medium">Premium</h3>
+                                <p class="text-sm text-gray-600">Vídeo chamadas, vídeos personalizados, suporte preferencial</p>
+                            </div>
+                            <span class="text-yellow-500 font-bold">€35/mês</span>
+                        </div>
+                        <button class="w-full bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg font-medium">
+                            Assinar
+                        </button>
+                    </div>
+                </div>
+                
+                <button onclick="hidePlansModal()" class="w-full mt-6 border border-gray-300 text-gray-700 hover:bg-gray-100 py-2 px-4 rounded-lg font-medium">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let currentUser = null;
+        let selectedInterests = [];
+        let selectedAvatars = [];
+        let currentChatAvatar = null;
+        
+        // Onboarding functions
+        function showLoginForm() {
+            document.getElementById('onboarding-screen').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('onboarding-screen').classList.add('hidden');
+                document.getElementById('login-form').classList.remove('hidden');
+            }, 500);
+        }
+        
+        function hideLoginForm() {
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('onboarding-screen').classList.remove('hidden', 'opacity-0');
+        }
+        
+        function showSignupForm() {
+            document.getElementById('onboarding-screen').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('onboarding-screen').classList.add('hidden');
+                document.getElementById('signup-form').classList.remove('hidden');
+            }, 500);
+        }
+        
+        function hideSignupForm() {
+            document.getElementById('signup-form').classList.add('hidden');
+            document.getElementById('onboarding-screen').classList.remove('hidden', 'opacity-0');
+        }
+        
+        function showForgotPassword() {
+            document.getElementById('onboarding-screen').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('onboarding-screen').classList.add('hidden');
+                document.getElementById('forgot-password').classList.remove('hidden');
+            }, 500);
+        }
+        
+        function hideForgotPassword() {
+            document.getElementById('forgot-password').classList.add('hidden');
+            document.getElementById('onboarding-screen').classList.remove('hidden', 'opacity-0');
+        }
+        
+        function continueAsGuest() {
+            currentUser = { name: "Convidado", email: "guest@vent.com", isGuest: true };
+            document.getElementById('onboarding-screen').classList.add('opacity-0');
+            setTimeout(() => {
+                document.getElementById('onboarding-screen').classList.add('hidden');
+                document.getElementById('personalization-screen').classList.remove('hidden');
+            }, 500);
+        }
+        
+        function loginUser() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            // Simple validation
+            if (!email || !password) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+            
+            // Simulate login
+            currentUser = { name: "Ana Carolina", email: email };
+            document.getElementById('login-form').classList.add('hidden');
+            document.getElementById('personalization-screen').classList.remove('hidden');
+        }
+        
+        function createAccount() {
+            const name = document.getElementById('signup-name').value;
+            const email = document.getElementById('signup-email').value;
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            
+            // Simple validation
+            if (!name || !email || !password || !confirmPassword) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                alert('As senhas não coincidem.');
+                return;
+            }
+            
+            // Simulate account creation
+            currentUser = { name: name, email: email };
+            document.getElementById('signup-form').classList.add('hidden');
+            document.getElementById('personalization-screen').classList.remove('hidden');
+        }
+        
+        function sendResetLink() {
+            const email = document.getElementById('forgot-email').value;
+            
+            if (!email) {
+                alert('Por favor, insira seu e-mail.');
+                return;
+            }
+            
+            alert(`Um link para redefinir sua senha foi enviado para ${email}`);
+            hideForgotPassword();
+        }
+        
+        // Personalization functions
+        function toggleInterest(element) {
+            element.classList.toggle('interest-selected');
+            
+            const interest = element.textContent.trim();
+            const index = selectedInterests.indexOf(interest);
+            
+            if (index === -1) {
+                selectedInterests.push(interest);
+            } else {
+                selectedInterests.splice(index, 1);
+            }
+        }
+        
+        function selectAvatar(element) {
+            element.classList.toggle('avatar-selected');
+            
+            const avatarName = element.querySelector('span:first-child').textContent;
+            const avatarRole = element.querySelector('span:last-child').textContent;
+            const avatarImg = element.querySelector('img').src;
+            
+            const avatar = {
+                name: avatarName,
+                role: avatarRole,
+                img: avatarImg
+            };
+            
+            const index = selectedAvatars.findIndex(a => a.name === avatarName);
+            
+            if (index === -1) {
+                selectedAvatars.push(avatar);
+            } else {
+                selectedAvatars.splice(index, 1);
+            }
+        }
+        
+        function completePersonalization() {
+            if (selectedAvatars.length === 0) {
+                alert('Por favor, selecione pelo menos um avatar.');
+                return;
+            }
+            
+            document.getElementById('personalization-screen').classList.add('hidden');
+            document.getElementById('app-interface').classList.remove('hidden');
+            
+            // Simulate loading user data
+            setTimeout(() => {
+                // Show welcome message in first chat
+                openChat(selectedAvatars[0].name);
+            }, 500);
+        }
+        
+        // Main app functions
+        function showTab(tabName) {
+            // Hide all tabs
+            document.getElementById('conversations-tab').classList.add('hidden');
+            document.getElementById('explore-tab').classList.add('hidden');
+            document.getElementById('community-tab').classList.add('hidden');
+            document.getElementById('settings-tab').classList.add('hidden');
+            
+            // Show selected tab
+            document.getElementById(`${tabName}-tab`).classList.remove('hidden');
+            
+            // Update active tab style
+            const tabs = document.querySelectorAll('nav button');
+            tabs.forEach(tab => {
+                tab.classList.remove('text-blue-500', 'tab-active');
+                tab.classList.add('text-gray-500');
+            });
+            
+            // Set current tab as active
+            const activeTab = document.querySelector(`nav button[onclick="showTab('${tabName}')"]`);
+            activeTab.classList.remove('text-gray-500');
+            activeTab.classList.add('text-blue-500', 'tab-active');
+        }
+        
+        function openChat(avatarName) {
+            const avatar = selectedAvatars.find(a => a.name === avatarName) || 
+                          { name: avatarName, role: "Novo contato", img: "https://randomuser.me/api/portraits/lego/1.jpg" };
+            
+            currentChatAvatar = avatar;
+            
+            // Update chat header
+            document.getElementById('chat-avatar-img').src = avatar.img;
+            document.getElementById('chat-avatar-name').textContent = avatar.name;
+            document.getElementById('chat-avatar-role').textContent = avatar.role;
+            
+            // Clear chat messages
+            document.getElementById('chat-messages').innerHTML = '';
+            
+            // Show welcome message if empty
+            if (avatarName === selectedAvatars[0]?.name) {
+                addMessage(avatar.name, `Olá ${currentUser.name.split(' ')[0]}! Eu sou ${avatar.name}, sua ${avatar.role.toLowerCase()}. Como você está hoje?`, true);
+            }
+            
+            // Show chat screen
+            document.getElementById('chat-screen').classList.remove('hidden');
+        }
+        
+        function closeChat() {
+            document.getElementById('chat-screen').classList.add('hidden');
+        }
+        
+        function startChat(avatarName) {
+            openChat(avatarName);
+            showTab('conversations');
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const message = input.value.trim();
+            
+            if (message) {
+                // Add user message
+                addMessage(currentUser.name, message, false);
+                input.value = '';
+                
+                // Simulate typing indicator
+                showTypingIndicator();
+                
+                // Simulate AI response after delay
+                setTimeout(() => {
+                    removeTypingIndicator();
+                    
+                    let response;
+                    const random = Math.random();
+                    
+                    if (random < 0.3) {
+                        response = "Eu entendo como você se sente. Quer falar mais sobre isso?";
+                    } else if (random < 0.6) {
+                        response = "Isso é muito interessante! O que mais você gostaria de compartilhar?";
+                    } else {
+                        response = "Todos temos dias assim. Lembre-se que amanhã é um novo dia!";
+                    }
+                    
+                    addMessage(currentChatAvatar.name, response, true);
+                }, 1000 + Math.random() * 2000);
+            }
+        }
+        
+        function addMessage(sender, text, isAI) {
+            const messagesContainer = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            
+            messageDiv.classList.add('flex', 'mb-4');
+            
+            if (isAI) {
+                messageDiv.classList.add('justify-start');
+                messageDiv.innerHTML = `
+                    <img src="${currentChatAvatar.img}" alt="${sender}" class="w-8 h-8 rounded-full mr-2 self-end">
+                    <div class="message-bubble bg-white rounded-xl p-3 shadow-sm">
+                        <p>${text}</p>
+                    </div>
+                `;
+            } else {
+                messageDiv.classList.add('justify-end');
+                messageDiv.innerHTML = `
+                    <div class="message-bubble bg-blue-500 text-white rounded-xl p-3 shadow-sm">
+                        <p>${text}</p>
+                    </div>
+                    <img src="https://randomuser.me/api/portraits/women/25.jpg" alt="${sender}" class="w-8 h-8 rounded-full ml-2 self-end">
+                `;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chat-messages');
+            const typingDiv = document.createElement('div');
+            
+            typingDiv.classList.add('flex', 'mb-4', 'justify-start', 'typing-indicator');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.innerHTML = `
+                <img src="${currentChatAvatar.img}" alt="${currentChatAvatar.name}" class="w-8 h-8 rounded-full mr-2 self-end">
+                <div class="bg-white rounded-xl p-3 shadow-sm flex">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(typingDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function removeTypingIndicator() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if
+</html>
